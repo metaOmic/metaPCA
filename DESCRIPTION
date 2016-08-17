@@ -7,4 +7,4 @@ Author: SungHwan Kim and George Tseng
 Maintainer: SungHwan Kim <swiss747@gmail.com>
 Description: More about what it does (maybe more than one line)
 License: GPL (>= 2)
-Depends: R (>= 2.10), PMA, impute
+Depends: R (>= 2.10), impute, PMA
