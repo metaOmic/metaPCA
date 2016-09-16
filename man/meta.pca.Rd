@@ -110,6 +110,7 @@ for(j in 1:4) {
 
 ## Sparse MetaPCA (SSC)
 library(PMA)
+library(doMC)
 res4 <- meta.pca(DList=Spellman, method="SSC", Meta.Dim=2, is.auto.Dim = TRUE, is.sparse=TRUE, Lambda=6)
 res4 <- res4$v
 coord <- list()
@@ -124,6 +125,16 @@ for(j in 1:4) {
  text(.coord[,1], .coord[,2], 1:nrow(.coord), cex=1)
  lines(.coord[,1], .coord[,2], col='grey55')     
 }
+
+####################################################################################################
+## Searching the optimal tuning parameter based on the proportion of increased explained variance
+####################################################################################################
+
+optimal.lambda <- meta.pca.cv(DList=Spellman, method="SSC", Meta.Dim=2, CV_lambda = seq(1,10,1), is.plot=TRUE)
+## optimal.lambda = 8
 }
+
+
+
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

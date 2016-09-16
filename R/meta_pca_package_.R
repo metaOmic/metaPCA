@@ -21,7 +21,7 @@ meta.pca <- function(DList,
                      .var.quantile= 0.8,
                      .scaleAdjust=FALSE,
                      is.sparse=FALSE,
-                     Lambda)
+                     Lambda=NULL)
   { 
   # Purpose 
   #     Dimension reduction and visualizaiton via metaPCA
@@ -78,7 +78,7 @@ meta.pca <- function(DList,
         }
     }
     if(is.sparse){
-      v <- SPC(Sum, sumabsv=Lambda, K=Meta.Dim, niter=20, orth=TRUE,center=TRUE)$v
+      v <- SPC(Sum, sumabsv=Lambda, K=Meta.Dim, niter=20, orth=TRUE,center=TRUE, trace=FALSE)$v
     }else{
       v <- eigen(Sum, symmetric = TRUE)$vectors[ ,1:Meta.Dim] 
     }
@@ -94,7 +94,7 @@ meta.pca <- function(DList,
     }
     
     if(is.sparse){
-      v <- SPC(all.Sum.sv, sumabsv=Lambda, K=Meta.Dim, niter=20, orth=TRUE,center=TRUE)$v
+      v <- SPC(all.Sum.sv, sumabsv=Lambda, K=Meta.Dim, niter=20, orth=TRUE,center=TRUE, trace=FALSE)$v
     }else{
       v <- eigen(all.Sum.sv, symmetric = TRUE)$vectors[,1:Meta.Dim]
      }
@@ -118,3 +118,42 @@ meta.pca <- function(DList,
   return(res)
 }
 
+
+meta.pca.cv <- function(DList, 
+                        method, 
+                        Meta.Dim, 
+                        is.auto.Dim = TRUE, 
+                        is.equal.Dim=FALSE, 
+                        e.Dim, 
+                        is.weight=TRUE,
+                        .var.quantile= 0.8,
+                        .scaleAdjust=FALSE,
+                        is.sparse=FALSE,
+                        CV_lambda = seq(1,10,1),
+                        is.plot=TRUE){
+  
+var.tmp <-foreach(i= CV_lambda,.combine=rbind) %do% {
+    res <- meta.pca(DList=DList, method=method, Meta.Dim=Meta.Dim, is.auto.Dim = TRUE, is.sparse=TRUE, Lambda=i)
+    non.zero <- sum(res$v != 0)
+    c(sum(foreach(ii = 1: length(res$coord),.combine=c) %do% {
+      sum(diag(var(res$coord[[ii]])))
+    }), non.zero)
+}
+
+num.nonzero <- var.tmp[,2]
+var.tmp <- var.tmp[,1]
+
+# plot(var.tmp ~ num.nonzero, type='o',ylab="Explained Variance",xlab="The number of non-penalized features",cex.lab=2,lwd=2,cex.axis=1.5)
+scree <-foreach(i= 1:10,.combine=c) %do% {
+  (var.tmp[i+1] - var.tmp[i]) / var.tmp[i+1]
+}
+
+if(is.plot){
+par(mfrow=c(1,1), mar=c(5, 5, 2, 4))
+plot(na.omit(scree) ~ num.nonzero[1:length(na.omit(scree))], type='o',ylab="Proportion of Increased Explained Variance",xlab="The number of non-penalized features",cex.lab=2,lwd=2,cex.axis=1.5)
+abline(h=0.1,col='red',lwd=2)
+}
+optimal.lambda <-  CV_lambda[sum(scree> 0.1, na.rm=TRUE)]
+return(optimal.lambda)
+}
+## optimal.lambda = 8

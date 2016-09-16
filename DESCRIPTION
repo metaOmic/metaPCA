@@ -1,10 +1,13 @@
 Package: metaPCA
 Type: Package
-Title: META-ANALYTIC PRINCIPAL COMPONENT ANALYSIS IN INTEGRATIVE OMICS APPLICATION
+Title: META-ANALYTIC PRINCIPAL COMPONENT ANALYSIS IN INTEGRATIVE OMICS
+        APPLICATION
 Version: 1.0
-Date: 2016-08-10
+Date: 2016-09-15
 Author: SungHwan Kim and George Tseng
 Maintainer: SungHwan Kim <swiss747@gmail.com>
 Description: More about what it does (maybe more than one line)
 License: GPL (>= 2)
-Depends: R (>= 2.10), impute, PMA
+Depends: R (>= 2.10), PMA, doMC
+NeedsCompilation: no
+Packaged: 2016-09-16 09:26:37 UTC; sunghwan
